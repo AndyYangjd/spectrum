@@ -3,8 +3,8 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
-OBJECTS_DIR += ./temp
-DESTDIR +=./bin
+OBJECTS_DIR += ../temp
+DESTDIR +=../bin
 
 TARGET = spec
 SOURCES += main.cpp
