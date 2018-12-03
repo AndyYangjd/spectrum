@@ -1,10 +1,12 @@
-#include <iostream>
 #include "spec.h"
 
-using namespace std;
+
 
 int main(int argc, char** argv)
 {
+    using namespace std;
+    using namespace spec;
+
     if( argc ==1 )
     {
         cout << "Please input photo name in dir /home/andy/ Desktop at command line." << endl
@@ -16,12 +18,24 @@ int main(int argc, char** argv)
         cout << "There are " << argc-1 << " image need to handle." << endl
              << "Enjory yourself" << endl;
     }
+
     Spec lena(argv[1]);
-    lena.empty();
     lena.showSizeSrc();
     lena.showSizeDft();
+
     lena.showAmp();
-    lena.showAmp(Spec::NORMYES());
+    lena.showAmp(spec::CENYES);
     lena.showPha();
-    lena.showPha(Spec::NORMYES());
+    lena.showPha(spec::CENYES);
+
+    char closeStatus;
+    cout << "Do your want to close all windows?" << endl
+         << "y for Yes, others for No :  ";
+    cin >> closeStatus;
+    lena.closeAllwindows(closeStatus);
+
+    if( closeStatus != 'y' )
+        lena.closeAllwindows('y');
+
+    return 0;
 }

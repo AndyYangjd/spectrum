@@ -1,4 +1,6 @@
 #include "spec.h"
+namespace spec
+{
 
 Spec::Spec()
 {
@@ -11,7 +13,13 @@ Spec::Spec(const string tmp)
     fileName = tmp;
     loadImg(fileName);
     getSize();
+    cenSpec();
+    convtF();
     expanSize();
+    copyExpan();
+    getDft();
+    getReIm();
+    getAmpPha();
 }
 
 void Spec::empty(void)
@@ -20,8 +28,7 @@ void Spec::empty(void)
         cout << "Load " << fileAdd << " fail ." << endl
              << "Your must choose a photo in "<< path << endl;
     else if(loadStatus == true)
-        cout << "Load " << fileAdd << " right." << endl
-             << "The " << fileName << " is in " << path << endl;
+        cout << "Load " << fileAdd << " right." << endl;
     else
         cout << "empty judgement error";
 }
@@ -33,7 +40,7 @@ cv::Size2i Spec::getSizeSrc(void)
 
 void Spec::showSizeSrc(void)
 {
-    cout << "The " << fileName  <<" Size is:  " << sizeSrc << endl;
+    cout << "The " << fileName  <<" Size is: " << sizeSrc << endl;
 }
 
 cv::Size2i Spec::getSizeDft(void)
@@ -43,89 +50,95 @@ cv::Size2i Spec::getSizeDft(void)
 
 void Spec::showSizeDft(void)
 {
-    cout << "The " <<fileName << " DFT Size is:  " << sizeDft << endl;
-}
-
-bool Spec::NORMYES(void)
-{
-    return true;
-}
-
-bool Spec::NORMNO(bool)
-{
-    return false;
+    cout << "The " <<fileName << " DFT Size is: " << sizeDft << endl;
 }
 
 cv::Mat Spec::getAmp(bool flag)
 {
+    cv::Mat m_err =srcFile-srcFile;
     if( flag == false )
     {
         return amp;
     }
     else if( flag == true )
     {
-        ampNorm =specScale(amp);
-        ampNorm =specNorm(ampNorm);
-        return ampNorm;
+        return ampCen;
     }
     else
-        cout <<  fileName << " getAmp normStatus error" << endl;
-}
-
-void Spec::showAmp(bool flag)
-{
-    if( flag == false )
     {
-        cv::imwrite( AMP+fileName, amp );
-        imshow( AMP+fileName, amp );
-        cv::waitKey(0);
+        cout <<  fileName << " getAmp CENSTATUS error" << endl;
+        return m_err;
     }
-    else if( flag == true )
-    {
-        ampNorm =specScale(amp);
-        ampNorm =specNorm(amp);
-
-        cv::imwrite( AMPNORM+fileName, ampNorm );
-        imshow( AMPNORM+fileName, ampNorm );
-        cv::waitKey(0)
-    }
-    else
-        cout << fileName << " showAmp normStatus error" << endl;
 }
 
 cv::Mat Spec::getPha(bool flag)
 {
+    cv::Mat m_err=srcFile-srcFile;
     if( flag == false )
     {
         return pha;
     }
     else if( flag == true )
     {
-        phaNorm =specScale(pha);
-        phaNorm =specNorm(pha);
-        return phaNorm;
+        return phaCen;
     }
     else
-        cout << fileName << " getPha normStatus error" << endl;
+    {
+        cout <<  fileName << " getPha CENSTATUS error" << endl;
+        return m_err;
+    }
+}
+
+void Spec::showAmp(bool flag)
+{
+    if( flag == false )
+    {
+        ampNorm =specScale(amp);
+        ampNorm =specNorm(ampNorm);
+
+        cv::imwrite( AMP+fileName, ampNorm );
+        cv::namedWindow( AMP+fileName );
+        cv::imshow( AMP+fileName, ampNorm );
+    }
+    else if( flag == true )
+    {
+        ampNormCen =specScale(ampCen);
+        ampNormCen =specNorm(ampNormCen);
+
+        cv::imwrite( AMPNORM+fileName, ampNormCen );
+        cv::namedWindow( AMPNORM+fileName );
+        cv::imshow( AMPNORM+fileName, ampNormCen );
+    }
 }
 
 void Spec::showPha(bool flag)
 {
     if( flag == false )
     {
-        cv::imwrite( PHA+fileName, pha );
-        imshow( PHA+fileName, pha );
-        cv::waitKey(0);
+        phaNorm =specScale(pha);
+        phaNorm =specNorm(phaNorm);
+
+        cv::imwrite( PHA+fileName, phaNorm );
+        cv::namedWindow( PHA+fileName );
+        cv::imshow( PHA+fileName, phaNorm );
     }
     else if( flag == true )
     {
-        phaNorm =specScale(pha);
-        phaNorm =specNorm(pha);
+        phaNormCen =specScale(phaCen);
+        phaNormCen =specNorm(phaNormCen);
 
-        cv::imwrite( PHANORM+fileName, phaNorm );
-        imshow( PHANORM+fileName, phaNorm );
-        cv::waitKey(0);
+        cv::imwrite( PHANORM+fileName, phaNormCen );
+        cv::namedWindow( PHANORM+fileName );
+        cv::imshow( PHANORM+fileName, phaNormCen );
     }
-    else
-        cout << fileName << " showPha normStatus error" << endl;
 }
+
+void Spec::closeAllwindows(char tmp)
+{
+    if( tmp == 'y' )
+        cv::destroyAllWindows();
+    else
+        cout << "Not close all windows." << endl;
+}
+
+} // namespace spec end

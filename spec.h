@@ -6,26 +6,39 @@
 #include <vector>
 #include <iostream>
 
-using namespace std;
+namespace spec
+{
+    using namespace std;
+    class Spec;
+
+    const bool CENYES =true;
+    const bool CENNO   =false;
+
+} // namespace spec end
+
+namespace spec
+{
 
 class Spec
 {
 private:
-    string fileName;
-    string path ="/home/andy/Desktop/";
-    string fileAdd;
-    bool loadStatus;
-    cv::Size2i sizeSrc, sizeDft;
-    cv::Mat srcFile, dftFile;
-    vector<cv::Mat> planes;
+    string fileName;                                  //file name
+    string path ="/home/andy/Desktop/";  // file path
+    string fileAdd;                                     // file address
+    bool loadStatus;                                 // status for read image right or wrong
+    cv::Size2i sizeSrc, sizeDft;                // the size for src and DFT
+    cv::Mat srcFile, srcCenFile;               // the file for src and Centralized
+    cv::Mat dftFile,  dftCenFile;                // the DFT file for src and Centralized
+    vector<cv::Mat> planes, planesCen;
     cv::Mat re, im, rePart, imPart;
-    cv::Mat amp, pha;
-    cv::Mat ampNorm, phaNorm;
+    cv::Mat amp, pha, ampNorm, phaNorm;
+    cv::Mat reCen, imCen, rePartCen, imPartCen;
+    cv::Mat ampCen, phaCen, ampNormCen, phaNormCen;
 
-    const string AMP ="the amp of ";
-    const string PHA ="the pha of ";
-    const string AMPNORM ="the ampnorm of ";
-    const string PHANORM ="the phanorm of ";
+    const string AMP ="the amplitude of ";
+    const string PHA ="the phase of ";
+    const string AMPNORM ="the amplitude after cen and norm of ";
+    const string PHANORM ="the phase after cen and norm of ";
 
     inline void loadImg(const string _filename);
     inline void getSize(void);
@@ -54,13 +67,13 @@ public:
     cv::Size2i getSizeDft(void);
     void showSizeDft(void);
 
-    bool NORMYES(void);
-    bool NORMNO(void);
+    cv::Mat getAmp  (bool flag=false);     // flag judegement the Centralize or not
+    cv::Mat getPha   (bool flag=false);
 
-    cv::Mat getAmp(bool flag=false);
-    void showAmp(bool flag=false);
-    cv::Mat getPha(bool flag=false);
-    void showPha(bool flag=false);
+    void showAmp    (bool flag=false);
+    void showPha     (bool flag=false);
+
+    void closeAllwindows(char tmp);
 
 };
 
@@ -68,8 +81,8 @@ inline void Spec::loadImg(const string  _filename)
 {
     fileName = _filename;
     fileAdd = path+fileName;
-    cout << "The file address is:  " << fileAdd << endl;
-    srcFile =cv::imread(fileAdd);
+    cout << "The file address is: " << fileAdd << endl;
+    srcFile =cv::imread(fileAdd, 0);
     if( srcFile.empty() )
     {
         cout << "Load " << fileAdd << " fail." << endl;
@@ -87,25 +100,28 @@ inline void Spec::getSize(void)
     sizeSrc.height = srcFile.cols;
 }
 
+// convert the srcFile centralize to srcCenFile
 inline void Spec::cenSpec(void)
 {
-    for(int i=0; i<srcFile.rows; i++)
-        for(int j=0; j<srcFile.cols; j++)
+    srcCenFile = srcFile.clone();
+    for(int i=0; i<sizeSrc.width; i++)
+        for(int j=0; j<sizeSrc.height; j++)
         {
             if( (i + j)%2 != 0)
-                srcFile.at<uchar>(i, j) = -srcFile.at<uchar>(i, j);
+                srcCenFile.at<uchar>(i, j) = -srcCenFile.at<uchar>(i, j);
         }
 }
 
 inline void Spec::convtF(void)
 {
     srcFile.convertTo(srcFile, CV_32F, 1, 0);
+    srcCenFile.convertTo (srcCenFile, CV_32F, 1, 0);
 }
 
 inline void Spec::expanSize(void)
 {
-    sizeDft.width =cv::getOptimalDFTSize(sizeSrc.width);
-    sizeDft.height =cv::getOptimalDFTSize(sizeSrc.height);
+    sizeDft.width =cv::getOptimalDFTSize(sizeSrc.width-1);
+    sizeDft.height =cv::getOptimalDFTSize(sizeSrc.height-1);
 }
 
 inline void Spec::copyExpan(void)
@@ -114,11 +130,16 @@ inline void Spec::copyExpan(void)
                                 0, sizeDft.width - sizeSrc.width,
                                 0, sizeDft.height - sizeSrc.height,
                                cv::BORDER_CONSTANT, cv::Scalar::all(0) );
+    cv::copyMakeBorder(srcCenFile, dftCenFile,
+                                0, sizeDft.width - sizeSrc.width,
+                                0, sizeDft.height - sizeSrc.height,
+                               cv::BORDER_CONSTANT, cv::Scalar::all(0) );
 }
 
 inline void Spec::getDft(void)
 {
     cv::dft(dftFile, dftFile, cv::DFT_COMPLEX_OUTPUT, srcFile.rows );
+    cv::dft(dftCenFile, dftCenFile, cv::DFT_COMPLEX_OUTPUT, srcCenFile.rows );
 }
 
 inline void Spec::getReIm(void)
@@ -127,17 +148,29 @@ inline void Spec::getReIm(void)
     if( planes.size() == 2)
     {
         re = *( planes.begin() );
-        rePart = re( cv::Rect(0, 0, sizeSrc.height, size.width) );
-        im = *( planes.end() );
-        imPart = im( cv::Rect(0, 0, sizeSrc.height, size.width) );
+        rePart = re( cv::Rect(0, 0, sizeSrc.height-1, sizeSrc.width-1) );
+        im = *( planes.end()-1 );
+        imPart = im( cv::Rect(0, 0, sizeSrc.height-1, sizeSrc.width-1) );
     }
     else
         cout << "Split error." << endl;
+
+    cv::split(dftCenFile, planesCen);
+    if( planesCen.size() == 2)
+    {
+        reCen = *( planesCen.begin() );
+        rePartCen = reCen( cv::Rect(0, 0, sizeSrc.height-1, sizeSrc.width-1) );
+        imCen = *( planesCen.end()-1 );
+        imPartCen = imCen( cv::Rect(0, 0, sizeSrc.height-1, sizeSrc.width-1) );
+    }
+    else
+        cout << "SplitCen error." << endl;
 }
 
 inline void Spec::getAmpPha(void)
 {
     cv::cartToPolar(rePart, imPart, amp, pha);
+    cv::cartToPolar(rePartCen, imPartCen, ampCen, phaCen);
 }
 
 inline cv::Mat Spec::specScale(cv::Mat _src)
@@ -154,30 +187,5 @@ inline cv::Mat Spec::specNorm(cv::Mat _src)
     return _src;
 }
 
-/*
-inline void Spec::getFileName(const string & _fileAdd)
-{
-    vector<string> files;
-    string path = "/home/andy/Desktop/";
-    DIR* pDir;               // file dir stream
-    struct dirent* ptr;
-
-    if( !( pDir =opendir(path.c_str() )) )     // assign the pDir to path
-        return;
-    while( (ptr =readdir(pDir)) !=0 )
-
-
-    dir =opendir( PATH.c_str() );      // get the dir handle
-    while( ptr=readdir(dir) !=NULL )
-    {
-        if( ptr->d_name[0]=="." )
-            continue;
-        files.push_back( ptr->d_name );
-    }
-    for( int i=0; i< files.size(); ++i )
-    {
-
-    }
-}
-*/
+}  // namespace spec end
 #endif // SPEC_H
