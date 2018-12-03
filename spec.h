@@ -4,8 +4,6 @@
 #include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
-#include <dirent.h>
-#include <dcache.h>
 #include <iostream>
 
 using namespace std;
@@ -14,6 +12,7 @@ class Spec
 {
 private:
     string fileName;
+    string path ="/home/andy/Desktop/";
     string fileAdd;
     bool loadStatus;
     cv::Size2i sizeSrc, sizeDft;
@@ -24,7 +23,12 @@ private:
     cv::Mat ampNorm, phaNorm;
     enum normStatus{normYes=0, normNo=1};
 
-    inline void loadImg(const string & _fileAdd);
+    const string AMP ="the amp of ";
+    const string PHA ="the pha of ";
+    const string AMPNORM ="the ampnorm of ";
+    const string PHANORM ="the phanorm of ";
+
+    inline void loadImg(const string _filename);
     inline void getSize(void);
     inline void cenSpec(void);
     inline void convtF(void);
@@ -40,7 +44,8 @@ private:
 //    inline void getFileName(const string & _fileAdd);
 
 public:
-    Spec(const string tmp = "NULL");
+    Spec();
+    Spec(const string tmp);
     ~Spec() {;}
 
     void empty(void);
@@ -60,9 +65,11 @@ public:
 };
 
 
-inline void Spec::loadImg(const string  _fileAdd)
+inline void Spec::loadImg(const string  _filename)
 {
-    fileAdd = _fileAdd;
+    fileName = _filename;
+    fileAdd = path+fileName;
+    cout << "The file address is:  " << fileAdd << endl;
     srcFile =cv::imread(fileAdd);
     if( srcFile.empty() )
     {

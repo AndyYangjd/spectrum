@@ -1,9 +1,15 @@
 #include "spec.h"
 
-Spec::Spec(const string tmp = "NULL")
+Spec::Spec()
 {
-    fileAdd = tmp;
-    loadImg(fileAdd);
+    cout << "The Spec Class now can't support default construction." << endl;
+    fileName ="/0";
+}
+
+Spec::Spec(const string tmp)
+{
+    fileName = tmp;
+    loadImg(fileName);
     getSize();
     expanSize();
 }
@@ -11,9 +17,11 @@ Spec::Spec(const string tmp = "NULL")
 void Spec::empty(void)
 {
     if(loadStatus == false)
-        cout << "Load " << fileAdd << " fail." << endl;
+        cout << "Load " << fileAdd << " fail ." << endl
+             << "Your must choose a photo in "<< path << endl;
     else if(loadStatus == true)
-        cout << "Load " << fileAdd << " right." << endl;
+        cout << "Load " << fileAdd << " right." << endl
+             << "The " << fileName << " is in " << path << endl;
     else
         cout << "empty judgement error";
 }
@@ -25,7 +33,7 @@ cv::Size2i Spec::getSizeSrc(void)
 
 void Spec::showSizeSrc(void)
 {
-    cout << "The image's Size is:  " << sizeSrc << endl;
+    cout << "The " << fileName  <<" Size is:  " << sizeSrc << endl;
 }
 
 cv::Size2i Spec::getSizeDft(void)
@@ -35,7 +43,7 @@ cv::Size2i Spec::getSizeDft(void)
 
 void Spec::showSizeDft(void)
 {
-    cout << "The DFT Size is:  " << sizeDft << endl;
+    cout << "The " <<fileName << " DFT Size is:  " << sizeDft << endl;
 }
 
 cv::Mat Spec::getAmp(const enum normStatus flag)
@@ -51,15 +59,15 @@ cv::Mat Spec::getAmp(const enum normStatus flag)
         return ampNorm;
     }
     else
-        cout << "getAmp normStatus error" << endl;
+        cout <<  fileName << " getAmp normStatus error" << endl;
 }
 
 void Spec::showAmp(const enum normStatus flag)
 {
     if( flag == normNo )
     {
-        cv::imwrite("the amp of src.png", amp);
-        imshow("the amp of src", amp);
+        cv::imwrite( AMP+fileName, amp );
+        imshow( AMP+fileName, amp );
         cv::waitKey(0);
     }
     else if( flag == normYes )
@@ -67,12 +75,12 @@ void Spec::showAmp(const enum normStatus flag)
         ampNorm =specScale(amp);
         ampNorm =specNorm(amp);
 
-        cv::imwrite("the ampNorm of src.png", ampNorm);
-        imshow("the ampNorm of src", ampNorm);
+        cv::imwrite( AMPNORM+fileName, ampNorm );
+        imshow( AMPNORM+fileName, ampNorm );
         cv::waitKey(0)
     }
     else
-        cout << "showAmp normStatus error" << endl;
+        cout << fileName << " showAmp normStatus error" << endl;
 }
 
 cv::Mat Spec::getPha(const enum normStatus flag)
@@ -88,15 +96,15 @@ cv::Mat Spec::getPha(const enum normStatus flag)
         return phaNorm;
     }
     else
-        cout << "getPha normStatus error" << endl;
+        cout << fileName << " getPha normStatus error" << endl;
 }
 
 void Spec::showPha(const enum normStatus flag)
 {
     if( flag == normNo )
     {
-        cv::imwrite("the pha of src.png", pha);
-        imshow("the pha of src", pha);
+        cv::imwrite( PHA+fileName, pha );
+        imshow( PHA+fileName, pha );
         cv::waitKey(0);
     }
     else if( flag == normYes )
@@ -104,10 +112,10 @@ void Spec::showPha(const enum normStatus flag)
         phaNorm =specScale(pha);
         phaNorm =specNorm(pha);
 
-        cv::imwrite("the phaNorm of src.png", phaNorm);
-        imshow("the phaNorm of src", phaNorm);
+        cv::imwrite( PHANORM+fileName, phaNorm );
+        imshow( PHANORM+fileName, phaNorm );
         cv::waitKey(0)
     }
     else
-        cout << "showPha normStatus error" << endl;
+        cout << fileName << " showPha normStatus error" << endl;
 }
