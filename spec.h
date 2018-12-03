@@ -21,7 +21,6 @@ private:
     cv::Mat re, im, rePart, imPart;
     cv::Mat amp, pha;
     cv::Mat ampNorm, phaNorm;
-    enum normStatus{normYes=0, normNo=1};
 
     const string AMP ="the amp of ";
     const string PHA ="the pha of ";
@@ -55,15 +54,15 @@ public:
     cv::Size2i getSizeDft(void);
     void showSizeDft(void);
 
-    void showSrc(void);
+    bool NORMYES(void);
+    bool NORMNO(void);
 
-    cv::Mat getAmp(const enum normStatus flag=0);
-    void showAmp(const enum normStatus flag=0);
-    cv::Mat getPha(const enum normStatus flag=0);
-    void showPha(const enum normStatus flag=0);
+    cv::Mat getAmp(bool flag=false);
+    void showAmp(bool flag=false);
+    cv::Mat getPha(bool flag=false);
+    void showPha(bool flag=false);
 
 };
-
 
 inline void Spec::loadImg(const string  _filename)
 {
