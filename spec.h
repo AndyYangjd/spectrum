@@ -22,16 +22,17 @@ namespace spec
 class Spec
 {
 private:
-    string fileName;                                  //file name
-    string path ="/home/andy/Desktop/";  // file path
-    string fileAdd;                                     // file address
+    string fileName;
+    string path ="/home/andy/Desktop/";
+    string fileAdd;
     bool loadStatus;                                 // status for read image right or wrong
     cv::Size2i sizeSrc, sizeDft;                // the size for src and DFT
     cv::Mat srcFile, srcCenFile;               // the file for src and Centralized
     cv::Mat dftFile,  dftCenFile;                // the DFT file for src and Centralized
+    cv::Mat srcRc;
     vector<cv::Mat> planes, planesCen;
     cv::Mat re, im, rePart, imPart;
-    cv::Mat amp, pha, ampNorm, phaNorm;
+    cv::Mat amp, pha, ampNorm, phaNorm, ampRc, phaRc;
     cv::Mat reCen, imCen, rePartCen, imPartCen;
     cv::Mat ampCen, phaCen, ampNormCen, phaNormCen;
 
@@ -39,6 +40,8 @@ private:
     const string PHA ="the phase of ";
     const string AMPNORM ="the amplitude after cen and norm of ";
     const string PHANORM ="the phase after cen and norm of ";
+    const string AMPRC ="the recreated image using amp of ";
+    const string PHARC ="the recreated image using pha of ";
 
     inline void loadImg(const string _filename);
     inline void getSize(void);
@@ -49,11 +52,8 @@ private:
     inline void getDft(void);
     inline void getReIm(void);
     inline void getAmpPha(void);
-    // scale the measure, use log(1 + amp/pha)
     inline cv::Mat specScale(cv::Mat _src);
     inline cv::Mat specNorm(cv::Mat _src);
-
-//    inline void getFileName(const string & _fileAdd);
 
 public:
     Spec();
@@ -70,8 +70,11 @@ public:
     cv::Mat getAmp  (bool flag=false);     // flag judegement the Centralize or not
     cv::Mat getPha   (bool flag=false);
 
-    void showAmp    (bool flag=false);
-    void showPha     (bool flag=false);
+    void saveAmp    (bool flag=false);
+    void savePha     (bool flag=false);
+
+    void saveRcUseAmp(void);
+    void saveRcUsePha(void);
 
     void closeAllwindows(char tmp);
 
@@ -127,13 +130,13 @@ inline void Spec::expanSize(void)
 inline void Spec::copyExpan(void)
 {
     cv::copyMakeBorder(srcFile, dftFile,
-                                0, sizeDft.width - sizeSrc.width,
-                                0, sizeDft.height - sizeSrc.height,
-                               cv::BORDER_CONSTANT, cv::Scalar::all(0) );
+                       0, sizeDft.width - sizeSrc.width,
+                       0, sizeDft.height - sizeSrc.height,
+                       cv::BORDER_CONSTANT, cv::Scalar::all(0) );
     cv::copyMakeBorder(srcCenFile, dftCenFile,
-                                0, sizeDft.width - sizeSrc.width,
-                                0, sizeDft.height - sizeSrc.height,
-                               cv::BORDER_CONSTANT, cv::Scalar::all(0) );
+                       0, sizeDft.width - sizeSrc.width,
+                       0, sizeDft.height - sizeSrc.height,
+                       cv::BORDER_CONSTANT, cv::Scalar::all(0) );
 }
 
 inline void Spec::getDft(void)
@@ -147,9 +150,9 @@ inline void Spec::getReIm(void)
     cv::split(dftFile, planes);
     if( planes.size() == 2)
     {
-        re = *( planes.begin() );
+        re = planes[0];
         rePart = re( cv::Rect(0, 0, sizeSrc.height-1, sizeSrc.width-1) );
-        im = *( planes.end()-1 );
+        im = planes[1];
         imPart = im( cv::Rect(0, 0, sizeSrc.height-1, sizeSrc.width-1) );
     }
     else
@@ -169,14 +172,16 @@ inline void Spec::getReIm(void)
 
 inline void Spec::getAmpPha(void)
 {
+    cv::cartToPolar(re, im, ampRc, phaRc);
     cv::cartToPolar(rePart, imPart, amp, pha);
     cv::cartToPolar(rePartCen, imPartCen, ampCen, phaCen);
 }
 
+// only use for amplitude 1+log(amp)
 inline cv::Mat Spec::specScale(cv::Mat _src)
 {
-    _src +=cv::Scalar::all(1);
     cv::log( _src, _src );
+    _src +=cv::Scalar::all(1);
     return _src;
 }
 

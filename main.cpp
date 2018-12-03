@@ -1,7 +1,5 @@
 #include "spec.h"
 
-
-
 int main(int argc, char** argv)
 {
     using namespace std;
@@ -20,22 +18,7 @@ int main(int argc, char** argv)
     }
 
     Spec lena(argv[1]);
-    lena.showSizeSrc();
-    lena.showSizeDft();
-
-    lena.showAmp();
-    lena.showAmp(spec::CENYES);
-    lena.showPha();
-    lena.showPha(spec::CENYES);
-
-    char closeStatus;
-    cout << "Do your want to close all windows?" << endl
-         << "y for Yes, others for No :  ";
-    cin >> closeStatus;
-    lena.closeAllwindows(closeStatus);
-
-    if( closeStatus != 'y' )
-        lena.closeAllwindows('y');
+    lena.saveRcUsePha();
 
     return 0;
 }

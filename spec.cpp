@@ -89,7 +89,7 @@ cv::Mat Spec::getPha(bool flag)
     }
 }
 
-void Spec::showAmp(bool flag)
+void Spec::saveAmp(bool flag)
 {
     if( flag == false )
     {
@@ -97,8 +97,6 @@ void Spec::showAmp(bool flag)
         ampNorm =specNorm(ampNorm);
 
         cv::imwrite( AMP+fileName, ampNorm );
-        cv::namedWindow( AMP+fileName );
-        cv::imshow( AMP+fileName, ampNorm );
     }
     else if( flag == true )
     {
@@ -106,30 +104,22 @@ void Spec::showAmp(bool flag)
         ampNormCen =specNorm(ampNormCen);
 
         cv::imwrite( AMPNORM+fileName, ampNormCen );
-        cv::namedWindow( AMPNORM+fileName );
-        cv::imshow( AMPNORM+fileName, ampNormCen );
     }
 }
 
-void Spec::showPha(bool flag)
+void Spec::savePha(bool flag)
 {
     if( flag == false )
     {
-        phaNorm =specScale(pha);
-        phaNorm =specNorm(phaNorm);
+        phaNorm =specNorm(pha);
 
         cv::imwrite( PHA+fileName, phaNorm );
-        cv::namedWindow( PHA+fileName );
-        cv::imshow( PHA+fileName, phaNorm );
     }
     else if( flag == true )
     {
-        phaNormCen =specScale(phaCen);
-        phaNormCen =specNorm(phaNormCen);
+        phaNormCen =specNorm(phaCen);
 
         cv::imwrite( PHANORM+fileName, phaNormCen );
-        cv::namedWindow( PHANORM+fileName );
-        cv::imshow( PHANORM+fileName, phaNormCen );
     }
 }
 
@@ -139,6 +129,31 @@ void Spec::closeAllwindows(char tmp)
         cv::destroyAllWindows();
     else
         cout << "Not close all windows." << endl;
+}
+
+void Spec::saveRcUseAmp(void)
+{
+
+}
+
+void Spec::saveRcUsePha(void)
+{
+    cv::Mat tmpAmp( sizeDft.width, sizeDft.height, CV_32F, cv::Scalar::all(1) );
+    cv::polarToCart(tmpAmp, phaRc,re, im);
+    re = planes[0];
+    im = planes[1];
+    if( planes.size() ==2 )
+    {
+        cv::merge(planes, dftFile);
+        cv::idft(dftFile, dftFile, cv::DFT_SCALE, sizeDft.width);
+        // dftFile type is CV32F_C2
+        cv::split(dftFile, planes);
+        srcRc =planes[0]( cv::Rect(0, 0, sizeSrc.height-1, sizeSrc.width-1) );
+        srcRc =specNorm(srcRc);
+        cv::imwrite(PHARC+fileName, srcRc);
+    }
+    else
+        cout << "saveRcUsePha merge fail" << endl;
 }
 
 } // namespace spec end
