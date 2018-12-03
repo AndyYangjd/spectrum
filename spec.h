@@ -21,6 +21,8 @@ private:
     vector<cv::Mat> planes;
     cv::Mat re, im, rePart, imPart;
     cv::Mat amp, pha;
+    cv::Mat ampNorm, phaNorm;
+    enum normStatus{normYes=0, normNo=1};
 
     inline void loadImg(const string & _fileAdd);
     inline void getSize(void);
@@ -31,6 +33,9 @@ private:
     inline void getDft(void);
     inline void getReIm(void);
     inline void getAmpPha(void);
+    // scale the measure, use log(1 + amp/pha)
+    inline cv::Mat specScale(cv::Mat _src);
+    inline cv::Mat specNorm(cv::Mat _src);
 
 //    inline void getFileName(const string & _fileAdd);
 
@@ -47,10 +52,10 @@ public:
 
     void showSrc(void);
 
-    cv::Mat getAmp(void);
-    void showAmp(void);
-    cv::Mat getPha(void);
-    void showPha(void);
+    cv::Mat getAmp(const enum normStatus flag=0);
+    void showAmp(const enum normStatus flag=0);
+    cv::Mat getPha(const enum normStatus flag=0);
+    void showPha(const enum normStatus flag=0);
 
 };
 
@@ -129,6 +134,20 @@ inline void Spec::getAmpPha(void)
     cv::cartToPolar(rePart, imPart, amp, pha);
 }
 
+inline cv::Mat Spec::specScale(cv::Mat _src)
+{
+    _src +=cv::Scalar::all(1);
+    cv::log( _src, _src );
+    return _src;
+}
+
+inline cv::Mat Spec::specNorm(cv::Mat _src)
+{
+    cv::normalize( _src, _src, 0, 1, cv::NORM_MINMAX );
+    _src.convertTo(_src, CV_8UC1, 255, 0);
+    return _src;
+}
+
 /*
 inline void Spec::getFileName(const string & _fileAdd)
 {
@@ -156,17 +175,3 @@ inline void Spec::getFileName(const string & _fileAdd)
 }
 */
 #endif // SPEC_H
-
-// get the interesting part of spec
-void spec_part(const int  filenum, cv::Mat* _file, cv::Mat* src, cv::Mat* dst);
-
-// scale the measure, use log(1 + amp/pha)
-void spec_scale(const int  filenum, cv::Mat* src);
-
-// normalize the spectrum
-void spec_norm(const int  filenum, cv::Mat* src);
-/*
-// save the spectrum
-void spec_save(const int  filenum, const std::string* fileadd_,
-               cv::Mat* src, const int & status);
-*/
