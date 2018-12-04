@@ -23,3 +23,6 @@ LIBS += \
     -lopencv_highgui\
     -lopencv_imgcodecs\
     -lopencv_imgproc\
+
+DISTFILES += \
+    spectrumAPI.txt
