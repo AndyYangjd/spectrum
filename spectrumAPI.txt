@@ -1,4 +1,0 @@
-// This txt give the private data(contain data type) and Spec Class API
-
-private data(contain type):
-1,

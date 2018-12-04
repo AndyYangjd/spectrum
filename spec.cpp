@@ -11,13 +11,15 @@ Spec::Spec()
 Spec::Spec(const string tmp)
 {
     fileName = tmp;
+
     loadImg(fileName);
     getSize();
-    cenSpec();
+
+    expadSize();
     convtF();
-    expanSize();
-    copyExpan();
-    getDft();
+    copyExpad();
+    centralize();
+    execDft();
     getReIm();
     getAmpPha();
 }
@@ -53,40 +55,14 @@ void Spec::showSizeDft(void)
     cout << "The " <<fileName << " DFT Size is: " << sizeDft << endl;
 }
 
-cv::Mat Spec::getAmp(bool flag)
+cv::Mat Spec::getAmp(void)
 {
-    cv::Mat m_err =srcFile-srcFile;
-    if( flag == false )
-    {
-        return amp;
-    }
-    else if( flag == true )
-    {
-        return ampCen;
-    }
-    else
-    {
-        cout <<  fileName << " getAmp CENSTATUS error" << endl;
-        return m_err;
-    }
+    return AmpPha[0];
 }
 
-cv::Mat Spec::getPha(bool flag)
+cv::Mat Spec::getPha(void)
 {
-    cv::Mat m_err=srcFile-srcFile;
-    if( flag == false )
-    {
-        return pha;
-    }
-    else if( flag == true )
-    {
-        return phaCen;
-    }
-    else
-    {
-        cout <<  fileName << " getPha CENSTATUS error" << endl;
-        return m_err;
-    }
+    return AmpPha[1];
 }
 
 void Spec::saveAmp(bool flag)

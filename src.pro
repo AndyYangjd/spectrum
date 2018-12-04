@@ -25,4 +25,4 @@ LIBS += \
     -lopencv_imgproc\
 
 DISTFILES += \
-    spectrumAPI.txt
+    readme.txt
