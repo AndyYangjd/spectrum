@@ -21,36 +21,32 @@ private:
     string fileName;
     string path ="/home/andy/Desktop/";
     string fileAdd;
-    bool loadStatus;
+    bool   loadStatus;
     cv::Mat srcFile;
     cv::Size2i sizeSrc, sizeDft;
     cv::Mat dftFile;
     vector<cv::Mat> ReIm;
-    vector<cv::Mat> AmpPha;
-    const cv::Rect2i srcRect=(0, 0, sizeSrc.width, sizeSrc.height);
+    cv::Mat amp, pha;
 
-    const string AMP ="the amplitude of ";
-    const string PHA ="the phase of ";
-    const string AMPNORM ="the amplitude after cen and norm of ";
-    const string PHANORM ="the phase after cen and norm of ";
-    const string AMPRC ="the recreated image using amp of ";
-    const string PHARC ="the recreated image using pha of ";
+    const string AMP ="the amp of ";
+    const string PHA ="the pha of ";
+    const string SRC ="the gray of ";
 
     // functions for initializing(default constration)
     inline void loadImg(const string _filename);     // #1
-    inline void getSize(void);                          // #2
+    inline void getSize(void);                                  // #2
 
     // functions for DFT and IDFT
     inline void expadSize(void);                     // #3
     inline void convtF(void);                           // #4
     inline void copyExpad(void);                    // #5
-    inline void centralize(void);                       // #6
+    inline cv::Mat centralize(cv::Mat _src);     // #6
     inline void execDft(void);                          // #7
     inline void getReIm(void);                         // #8
     inline void getAmpPha(void);                    // #9
 
-    inline cv::Mat specScale(cv::Mat _src);
-    inline cv::Mat specNorm(cv::Mat _src);
+    inline cv::Mat scale(cv::Mat _src);         // #10
+    inline cv::Mat calib8U(cv::Mat _src);      // #11
 
 public:
     Spec();
@@ -70,10 +66,8 @@ public:
     void saveAmp    (void);                    // #9
     void savePha     (void);                    // #10
 
-    void saveRcUseAmp(void);
-    void saveRcUsePha(void);
-
-    void closeAllwindows(char tmp);
+    cv::Mat getSrcFile(void);                      // #11
+    void saveSrcFile(void);                    // #12
 
 };
 
@@ -125,14 +119,15 @@ inline void Spec::copyExpad(void)
 }
 
 // #6
-inline void Spec::centralize(void)
+inline cv::Mat Spec::centralize(cv::Mat _src)
 {
-    for(int i=0; i<dftFile.width; i++)
-        for(int j=0; j<dftFile.height; j++)
+    for(int i=0; i<_src.rows; i++)
+        for(int j=0; j<_src.cols; j++)
         {
             if( (i + j)%2 != 0)
-                dftFile.at<uchar>(i, j) = dftFile.at<uchar>(i, j);
+                _src.at<uchar>(i, j) = - _src.at<uchar>(i, j);
         }
+    return _src;
 }
 
 // #7
@@ -150,21 +145,22 @@ inline void Spec::getReIm(void)
 // #9
 inline void Spec::getAmpPha(void)
 {
-    cv::cartToPolar(ReIm[0], ReIm[1], AmpPha[0], AmpPha[1]);
+    cv::cartToPolar(ReIm[0], ReIm[1], amp, pha);
 }
 
-// only use for amplitude 1+log(amp)
-inline cv::Mat Spec::specScale(cv::Mat _src)
+//  #10 Scale the image using log(amp+1)
+inline cv::Mat Spec::scale(cv::Mat _src)
 {
-    cv::log( _src, _src );
     _src +=cv::Scalar::all(1);
+    cv::log( _src, _src );
     return _src;
 }
 
-inline cv::Mat Spec::specNorm(cv::Mat _src)
+// #11
+inline cv::Mat Spec::calib8U(cv::Mat _src)
 {
     cv::normalize( _src, _src, 0, 1, cv::NORM_MINMAX );
-    _src.convertTo(_src, CV_8UC1, 255, 0);
+    _src.convertTo(_src, CV_8U, 255, 0);
     return _src;
 }
 

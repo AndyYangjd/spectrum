@@ -8,6 +8,7 @@ Spec::Spec()
     fileName ="/0";
 }
 
+// #1
 Spec::Spec(const string tmp)
 {
     fileName = tmp;
@@ -18,12 +19,13 @@ Spec::Spec(const string tmp)
     expadSize();
     convtF();
     copyExpad();
-    centralize();
+    dftFile =centralize(dftFile);
     execDft();
     getReIm();
     getAmpPha();
 }
 
+// #2
 void Spec::empty(void)
 {
     if(loadStatus == false)
@@ -35,101 +37,71 @@ void Spec::empty(void)
         cout << "empty judgement error";
 }
 
+// #3
 cv::Size2i Spec::getSizeSrc(void)
 {
     return sizeSrc;
 }
 
+// #4
 void Spec::showSizeSrc(void)
 {
     cout << "The " << fileName  <<" Size is: " << sizeSrc << endl;
 }
 
+// #5
 cv::Size2i Spec::getSizeDft(void)
 {
     return sizeDft;
 }
 
+// #6
 void Spec::showSizeDft(void)
 {
     cout << "The " <<fileName << " DFT Size is: " << sizeDft << endl;
 }
 
+// #7
 cv::Mat Spec::getAmp(void)
 {
-    return AmpPha[0];
+    return amp;
 }
 
+// #8
 cv::Mat Spec::getPha(void)
 {
-    return AmpPha[1];
+    return pha;
 }
 
-void Spec::saveAmp(bool flag)
+// #9
+void Spec::saveAmp(void)
 {
-    if( flag == false )
-    {
-        ampNorm =specScale(amp);
-        ampNorm =specNorm(ampNorm);
-
-        cv::imwrite( AMP+fileName, ampNorm );
-    }
-    else if( flag == true )
-    {
-        ampNormCen =specScale(ampCen);
-        ampNormCen =specNorm(ampNormCen);
-
-        cv::imwrite( AMPNORM+fileName, ampNormCen );
-    }
+    cv::Mat tmp;
+    tmp =amp( cv::Rect(0, 0, sizeSrc.width, sizeSrc.height) );
+    tmp =scale(tmp);
+    tmp =calib8U(tmp);
+    cv::imwrite( AMP+fileName, tmp );
 }
 
-void Spec::savePha(bool flag)
+// #10
+void Spec::savePha(void)
 {
-    if( flag == false )
-    {
-        phaNorm =specNorm(pha);
-
-        cv::imwrite( PHA+fileName, phaNorm );
-    }
-    else if( flag == true )
-    {
-        phaNormCen =specNorm(phaCen);
-
-        cv::imwrite( PHANORM+fileName, phaNormCen );
-    }
+    cv::Mat tmp;
+    tmp =pha( cv::Rect(0, 0, sizeSrc.width, sizeSrc.height) );
+    tmp =scale(tmp);
+    tmp =calib8U(tmp);
+    cv::imwrite( PHAcl+fileName, tmp );
 }
 
-void Spec::closeAllwindows(char tmp)
+// #11
+cv::Mat Spec::getSrcFile(void)
 {
-    if( tmp == 'y' )
-        cv::destroyAllWindows();
-    else
-        cout << "Not close all windows." << endl;
+    return srcFile;
 }
 
-void Spec::saveRcUseAmp(void)
+// #12
+void Spec::saveSrcFile(void)
 {
-
+    cv::imwrite( SRC+fileName, srcFile );
 }
-
-void Spec::saveRcUsePha(void)
-{
-    cv::Mat tmpAmp( sizeDft.width, sizeDft.height, CV_32F, cv::Scalar::all(1) );
-    cv::polarToCart(tmpAmp, phaRc,re, im);
-    re = planes[0];
-    im = planes[1];
-    if( planes.size() ==2 )
-    {
-        cv::merge(planes, dftFile);
-        cv::idft(dftFile, dftFile, cv::DFT_SCALE, sizeDft.width);
-        // dftFile type is CV32F_C2
-        cv::split(dftFile, planes);
-        srcRc =planes[0]( cv::Rect(0, 0, sizeSrc.height-1, sizeSrc.width-1) );
-        srcRc =specNorm(srcRc);
-        cv::imwrite(PHARC+fileName, srcRc);
-    }
-    else
-        cout << "saveRcUsePha merge fail" << endl;
-}
-
 } // namespace spec end

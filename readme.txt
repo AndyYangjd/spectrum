@@ -1,6 +1,6 @@
 // This txt give the private data(contain data type) and Spec Class API
 
-private data(contain type):
+// private data(contain type):
 num		dataname			type			comment
 1		fileName			string			the image name which you want to handle
 2		path		    	string			the target directory where contain the image file(the file must be in this dir)
@@ -11,16 +11,15 @@ num		dataname			type			comment
 7		sizeDft				cv::size2i	the size of expadding the image for DFT
 8		dftFile				cv::Mat			conserve values after srcFile's DFT and IDFT
 9 	ReIm		vector<cv::Mat>		save the real and imaginary part after srcFile's DFT and IDFT
-10	AmpPha	vector<cv::Mat>		get the amplitude and phase values
-11	srcRect				cv::Rect		the Rect of srcFile
+10	amp,pha				cv::Mat			get the amplitude and phase values
 
-functions for initializing(default constration):
+// inline private functions:
 num	functionName		comment
+(for initializing:)
 1		loadImg				read,convert the image to grayscale,then load to srcFile, type is CV_8UC1
 2		getSize				get image's size and save to sizeSrc
 
-functions for DFT and IDFT:
-num	functionName		comment
+(for DFT and IDFT:)
 3		expadSize				get the expadding size and save to sizeDft
 4		convtF					convert the srcFile type(CV_8UC1) to CV_32FC1,should not damage the srcFile
 5		copyExpad				expad the copySrcFile to dftFile
@@ -29,8 +28,11 @@ num	functionName		comment
 8		getReIm					get the real and imaginary part after DFT
 9		getAmpPha				get the amplitude and phase part after DFT
 
+(for show and save:)
+10	scale						scale the input using log(1+_src),not damage the data
+11	calib8U					calibrate the input to CV_8U, not damage the data
 
-API(public functions):
+// API(public functions):
 num		functionName				comment
 1		Spec						now the only construction
 2		empty						judgement the read status, true for right, others wrong
@@ -42,4 +44,4 @@ num		functionName				comment
 8		getPha					get the phase value
 9		saveAmp					save the amplitude
 10	savePha					save the phase
-
+11	saveSrcFile			save the graysacle type of src image
