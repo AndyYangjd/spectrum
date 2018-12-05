@@ -1,9 +1,10 @@
 #include "spec.h"
+#include "myspace.h"
 
 int main(int argc, char** argv)
 {
     using namespace std;
-    using namespace spec;
+    using namespace myspace;
 
     if( argc ==1 )
     {
@@ -18,12 +19,21 @@ int main(int argc, char** argv)
     }
 
     Spec img1(argv[1]);
-    img1.empty();
-    img1.showSizeSrc();
-    img1.showSizeDft();
-    img1.saveAmp();
-    img1.savePha();
-    img1.saveSrcFile();
+    cv::Mat imgPha =img1.getPha();
+    cv::Size2i size=img1.getSizeDft();
+    cv::Mat tmpAmp(size, CV_32FC1, cv::Scalar::all(1));
+    cv::Mat re, im;
+    cv::polarToCart(tmpAmp, imgPha, re, im);
+    cv::Mat planes[2]={re, im};
+    cv::Mat rc;
+    cv::merge(planes, 2, rc);
+    cv::idft(rc, rc, cv::DFT_SCALE, img1.getSizeSrc().height);
+    cv::split(rc, planes);
+    planes[0] =planes[0]( cv::Rect(0, 0, img1.getSizeSrc().width, img1.getSizeSrc().height) );
+
+    planes[0] =Display::calib8U(planes[0]);
+    cv::imshow("rc", planes[0]);
+    cv::waitKey(0);
 
     return 0;
 }

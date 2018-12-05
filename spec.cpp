@@ -1,15 +1,17 @@
 #include "spec.h"
-namespace spec
+
+namespace myspace
 {
 
-Spec::Spec()
+Spec::Spec():
+    Display()
 {
-    cout << "The Spec Class now can't support default construction." << endl;
+    std::cout << "The Spec Class now can't support default construction." << std::endl;
     fileName ="/0";
 }
 
 // #1
-Spec::Spec(const string tmp)
+Spec::Spec(const std::string tmp)
 {
     fileName = tmp;
 
@@ -26,54 +28,42 @@ Spec::Spec(const string tmp)
 }
 
 // #2
-void Spec::empty(void)
-{
-    if(loadStatus == false)
-        cout << "Load " << fileAdd << " fail ." << endl
-             << "Your must choose a photo in "<< path << endl;
-    else if(loadStatus == true)
-        cout << "Load " << fileAdd << " right." << endl;
-    else
-        cout << "empty judgement error";
-}
-
-// #3
 cv::Size2i Spec::getSizeSrc(void)
 {
     return sizeSrc;
 }
 
-// #4
+// #3
 void Spec::showSizeSrc(void)
 {
-    cout << "The " << fileName  <<" Size is: " << sizeSrc << endl;
+    std::cout << "The " << fileName  <<" Size is: " << sizeSrc << std::endl;
 }
 
-// #5
+// #4
 cv::Size2i Spec::getSizeDft(void)
 {
     return sizeDft;
 }
 
-// #6
+// #5
 void Spec::showSizeDft(void)
 {
-    cout << "The " <<fileName << " DFT Size is: " << sizeDft << endl;
+    std::cout << "The " <<fileName << " DFT Size is: " << sizeDft << std::endl;
 }
 
-// #7
+// #6
 cv::Mat Spec::getAmp(void)
 {
     return amp;
 }
 
-// #8
+// #7
 cv::Mat Spec::getPha(void)
 {
     return pha;
 }
 
-// #9
+// #8
 void Spec::saveAmp(void)
 {
     cv::Mat tmp;
@@ -83,25 +73,26 @@ void Spec::saveAmp(void)
     cv::imwrite( AMP+fileName, tmp );
 }
 
-// #10
+// #9
 void Spec::savePha(void)
 {
     cv::Mat tmp;
     tmp =pha( cv::Rect(0, 0, sizeSrc.width, sizeSrc.height) );
     tmp =scale(tmp);
     tmp =calib8U(tmp);
-    cv::imwrite( PHAcl+fileName, tmp );
+    cv::imwrite( PHA+fileName, tmp );
 }
 
-// #11
+// #10
 cv::Mat Spec::getSrcFile(void)
 {
     return srcFile;
 }
 
-// #12
+// #11
 void Spec::saveSrcFile(void)
 {
     cv::imwrite( SRC+fileName, srcFile );
 }
-} // namespace spec end
+
+} // namespace myspace end

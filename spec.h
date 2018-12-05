@@ -5,35 +5,29 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "display.h"
 
-namespace spec
-{
-    using namespace std;
-    class Spec;
-} // namespace spec end
-
-namespace spec
+namespace myspace
 {
 
-class Spec
+class Spec : public myspace::Display
 {
 private:
-    string fileName;
-    string path ="/home/andy/Desktop/";
-    string fileAdd;
-    bool   loadStatus;
+    std::string fileName;
+    std::string path ="/home/andy/Desktop/";
+    std::string fileAdd;
     cv::Mat srcFile;
     cv::Size2i sizeSrc, sizeDft;
     cv::Mat dftFile;
-    vector<cv::Mat> ReIm;
+    std::vector<cv::Mat> ReIm;
     cv::Mat amp, pha;
 
-    const string AMP ="the amp of ";
-    const string PHA ="the pha of ";
-    const string SRC ="the gray of ";
+    const std::string AMP ="the amp of ";
+    const std::string PHA ="the pha of ";
+    const std::string SRC ="the gray of ";
 
     // functions for initializing(default constration)
-    inline void loadImg(const string _filename);     // #1
+    inline void loadImg(const std::string _filename);     // #1
     inline void getSize(void);                                  // #2
 
     // functions for DFT and IDFT
@@ -45,47 +39,41 @@ private:
     inline void getReIm(void);                         // #8
     inline void getAmpPha(void);                    // #9
 
-    inline cv::Mat scale(cv::Mat _src);         // #10
-    inline cv::Mat calib8U(cv::Mat _src);      // #11
-
 public:
     Spec();
-    Spec(const string tmp);                   // #1
+    Spec(const std::string tmp);                   // #1
     ~Spec() {;}
 
-    void empty(void);                            // #2
+    cv::Size2i getSizeSrc(void);            // #2
+    void showSizeSrc(void);                 // #3
+    cv::Size2i getSizeDft(void);            // #4
+    void showSizeDft(void);                 // #5
 
-    cv::Size2i getSizeSrc(void);            // #3
-    void showSizeSrc(void);                 // #4
-    cv::Size2i getSizeDft(void);            // #5
-    void showSizeDft(void);                 // #6
+    cv::Mat getAmp  (void);                   // #6
+    cv::Mat getPha   (void);                   // #7
 
-    cv::Mat getAmp  (void);                   // #7
-    cv::Mat getPha   (void);                   // #8
+    void saveAmp    (void);                    // #8
+    void savePha     (void);                    // #9
 
-    void saveAmp    (void);                    // #9
-    void savePha     (void);                    // #10
-
-    cv::Mat getSrcFile(void);                      // #11
-    void saveSrcFile(void);                    // #12
-
+    cv::Mat getSrcFile(void);                  // #10
+    void saveSrcFile(void);                    // #11
 };
 
+}  // namespace myspace end
+
+
+namespace myspace
+{
+
 // #1
-inline void Spec::loadImg(const string  _filename)
+inline void Spec::loadImg(const std::string  _filename)
 {
     fileName = _filename;
     fileAdd = path+fileName;
-    cout << "The file address is: " << fileAdd << endl;
     srcFile =cv::imread(fileAdd, 0);
     if( srcFile.empty() )
     {
-        cout << "Load " << fileAdd << " fail." << endl;
-        loadStatus = false;
-    }
-    else {
-        cout << "Load " << fileAdd << " right." << endl;
-        loadStatus = true;
+        std::cout << "Load the input image Error." << std::endl;
     }
 }
 
@@ -106,7 +94,7 @@ inline void Spec::expadSize(void)
 // #4
 inline void Spec::convtF(void)
 {
-    srcFile.convertTo(dftFile, CV_32F, 1, 0);
+    srcFile.convertTo(dftFile, CV_32F, 1, -mean(srcFile)[0]);
 }
 
 // #5
@@ -148,21 +136,6 @@ inline void Spec::getAmpPha(void)
     cv::cartToPolar(ReIm[0], ReIm[1], amp, pha);
 }
 
-//  #10 Scale the image using log(amp+1)
-inline cv::Mat Spec::scale(cv::Mat _src)
-{
-    _src +=cv::Scalar::all(1);
-    cv::log( _src, _src );
-    return _src;
-}
-
-// #11
-inline cv::Mat Spec::calib8U(cv::Mat _src)
-{
-    cv::normalize( _src, _src, 0, 1, cv::NORM_MINMAX );
-    _src.convertTo(_src, CV_8U, 255, 0);
-    return _src;
-}
-
 }  // namespace spec end
+
 #endif // SPEC_H

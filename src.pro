@@ -8,7 +8,9 @@ DESTDIR +=../bin
 
 TARGET = spectrum
 SOURCES += main.cpp \
-    spec.cpp
+    spec.cpp \
+    display.cpp \
+    applyfilter.cpp
 
 INCLUDEPATH +=\
     /usr/local/include/opencv\
@@ -16,6 +18,9 @@ INCLUDEPATH +=\
 
 HEADERS += \
     spec.h\
+    display.h \
+    myspace.h \
+    applyfilter.h
 
 LIBS += \
 -L/usr/local/lib\
