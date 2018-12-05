@@ -34,10 +34,10 @@ private:
     inline void expadSize(void);                     // #3
     inline void convtF(void);                           // #4
     inline void copyExpad(void);                    // #5
-    inline cv::Mat centralize(cv::Mat _src);     // #6
-    inline void execDft(void);                          // #7
-    inline void getReIm(void);                         // #8
-    inline void getAmpPha(void);                    // #9
+
+    inline void execDft(void);                          // #6
+    inline void getReIm(void);                         // #7
+    inline void getAmpPha(void);                    // #8
 
 public:
     Spec();
@@ -107,30 +107,18 @@ inline void Spec::copyExpad(void)
 }
 
 // #6
-inline cv::Mat Spec::centralize(cv::Mat _src)
-{
-    for(int i=0; i<_src.rows; i++)
-        for(int j=0; j<_src.cols; j++)
-        {
-            if( (i + j)%2 != 0)
-                _src.at<uchar>(i, j) = - _src.at<uchar>(i, j);
-        }
-    return _src;
-}
-
-// #7
 inline void Spec::execDft(void)
 {
     cv::dft(dftFile, dftFile, cv::DFT_COMPLEX_OUTPUT, sizeSrc.height);
 }
 
-// #8
+// #7
 inline void Spec::getReIm(void)
 {
     cv::split(dftFile, ReIm);
 }
 
-// #9
+// #8
 inline void Spec::getAmpPha(void)
 {
     cv::cartToPolar(ReIm[0], ReIm[1], amp, pha);

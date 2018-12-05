@@ -1,5 +1,6 @@
 #include "spec.h"
 #include "myspace.h"
+#include "applyfilter.h"
 
 int main(int argc, char** argv)
 {
@@ -19,21 +20,25 @@ int main(int argc, char** argv)
     }
 
     Spec img1(argv[1]);
-    cv::Mat imgPha =img1.getPha();
-    cv::Size2i size=img1.getSizeDft();
-    cv::Mat tmpAmp(size, CV_32FC1, cv::Scalar::all(1));
-    cv::Mat re, im;
-    cv::polarToCart(tmpAmp, imgPha, re, im);
-    cv::Mat planes[2]={re, im};
-    cv::Mat rc;
-    cv::merge(planes, 2, rc);
-    cv::idft(rc, rc, cv::DFT_SCALE, img1.getSizeSrc().height);
-    cv::split(rc, planes);
-    planes[0] =planes[0]( cv::Rect(0, 0, img1.getSizeSrc().width, img1.getSizeSrc().height) );
+    cv::Size2i size1=img1.getSizeDft();
+    cv::Mat imgPha1 =img1.getPha();
+    cv::Mat imgAmp1 =img1.getAmp();
+    imgAmp1.setTo(1);
 
-    planes[0] =Display::calib8U(planes[0]);
-    cv::imshow("rc", planes[0]);
-    cv::waitKey(0);
+
+    Spec img2(argv[2]);
+    cv::Size2i size2=img2.getSizeDft();
+    cv::Mat imgPha2 =img2.getPha();
+    cv::Mat imgAmp2 =img2.getAmp();
+    imgAmp2.setTo(1);
+    imgPha2.setTo(0);
+
+    if( size1 == size2 )
+    {
+        ApplyFilter b(imgAmp1, imgPha1, imgAmp2, imgPha2, size1);
+        b.saveOutput();
+        b.showOutput();
+    }
 
     return 0;
 }

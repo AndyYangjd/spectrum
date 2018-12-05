@@ -3,6 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 #include "display.h"
+#include <iostream>
 
 namespace myspace
 {
@@ -19,8 +20,11 @@ private:
 public:
     ApplyFilter(cv::Mat _src, cv::Mat _filter, cv::Size2i size);
     ApplyFilter(cv::Mat _amp1, cv::Mat _pha,
-                cv::Mat _amp2, cv::Mat _pha2=cv::Scalar::all(1),
+                cv::Mat _amp2, cv::Mat _pha2,
                 cv::Size2i size);
+    ~ApplyFilter() {;}
+    void showOutput(void);
+    void saveOutput(void);
 };
 
 }
@@ -41,6 +45,7 @@ inline cv::Mat ApplyFilter::crtReIm(cv::Mat _amp, cv::Mat _pha)
 
 inline void ApplyFilter::getRe(cv::Mat & _src)
 {
+    using namespace std;
     cv::Mat planes[2];
     cv::split(_src, planes);
     output = planes[0].clone();
