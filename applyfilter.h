@@ -12,16 +12,17 @@ class ApplyFilter  : public myspace::Display
 {
 private:
     cv::Mat src, filter;
+    cv::Mat amp, pha;
     cv::Mat output;
 
-    inline cv::Mat crtReIm(cv::Mat _amp, cv::Mat _pha);
-    inline void getRe(cv::Mat & _src);
+    inline void crtReIm(void);
+    inline void getRe(void);
 
 public:
-    ApplyFilter(cv::Mat _src, cv::Mat _filter, cv::Size2i size);
+    ApplyFilter(cv::Mat _src, cv::Mat _filter, cv::Size2i _size);
     ApplyFilter(cv::Mat _amp1, cv::Mat _pha,
                 cv::Mat _amp2, cv::Mat _pha2,
-                cv::Size2i size);
+                cv::Size2i _size);
     ~ApplyFilter() {;}
     void showOutput(void);
     void saveOutput(void);
@@ -33,21 +34,20 @@ public:
 namespace myspace
 {
 
-inline cv::Mat ApplyFilter::crtReIm(cv::Mat _amp, cv::Mat _pha)
+inline void ApplyFilter::crtReIm(void)
 {
     cv::Mat re,im;
-    cv::polarToCart(_amp, _pha, re, im);
-    cv::Mat planes[2] ={re, im};
-    cv::Mat rc;
-    cv::merge(planes, 2, rc);
-    return rc;
+    cv::polarToCart(amp, pha, re, im);
+    std::vector<cv::Mat> planes;
+    planes.push_back( re.clone() );
+    planes.push_back( im.clone() );
+    cv::merge(planes, src);
 }
 
-inline void ApplyFilter::getRe(cv::Mat & _src)
+inline void ApplyFilter::getRe(void)
 {
-    using namespace std;
     cv::Mat planes[2];
-    cv::split(_src, planes);
+    cv::split(src, planes);
     output = planes[0].clone();
 }
 

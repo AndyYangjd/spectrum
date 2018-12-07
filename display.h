@@ -12,7 +12,7 @@ public:
     ~Display() {;}
 
 protected:
-    cv::Mat scale(cv::Mat _src);           // #2
+    cv::Mat scale(cv::Mat _src_);           // #2
     cv::Mat calib8U(cv::Mat _src);       // #3
     cv::Mat centralize(cv::Mat _src);   // #4
 };

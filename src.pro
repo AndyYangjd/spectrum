@@ -19,7 +19,6 @@ INCLUDEPATH +=\
 HEADERS += \
     spec.h\
     display.h \
-    myspace.h \
     applyfilter.h
 
 LIBS += \

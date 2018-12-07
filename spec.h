@@ -94,7 +94,7 @@ inline void Spec::expadSize(void)
 // #4
 inline void Spec::convtF(void)
 {
-    srcFile.convertTo(dftFile, CV_32F, 1, -mean(srcFile)[0]);
+    srcFile.convertTo(dftFile, CV_32F, 1, 0);
 }
 
 // #5
